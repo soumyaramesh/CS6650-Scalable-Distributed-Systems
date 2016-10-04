@@ -10,6 +10,12 @@ public class BSDSContent {
     private String message;
     private int timeToLIve;
 
+    public BSDSContent(String title, String message, int timeToLive) {
+        this.setTitle(title);
+        this.setMessage(message);
+        this.setTimeToLIve(timeToLive);
+    }
+
     public String getTitle() {
         return title;
     }
