@@ -50,8 +50,7 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
     public synchronized void publishContent(String publisherID, String title, String message, int TimeToLive)
             throws RemoteException {
         String topic = publisherToTopic.get(publisherID);
-        HashSet<String> subscriberSet = topicToSubscribers.get(topic).isEmpty()?new HashSet<>():topicToSubscribers.get(topic);
-        System.out.println(topic);
+        HashSet<String> subscriberSet = topicToSubscribers.containsKey(topic)?topicToSubscribers.get(topic):new HashSet<>();
         if (!topicQueues.containsKey(topic)) {
             throw new NullPointerException("Could not find publisher for this topic");
         } else {
@@ -67,7 +66,9 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
         String subId = UUID.randomUUID().toString();
         subscriberToTopic.put(subId, topic);
         if(topicToSubscribers.containsKey(topic)) {
-            topicToSubscribers.get(topic).add(subId);
+            HashSet<String> subscribersForTopic = topicToSubscribers.get(topic);
+            subscribersForTopic.add(subId);
+            topicToSubscribers.put(topic,subscribersForTopic);
         }
         else {
             HashSet<String> newSubList = new HashSet<>();
@@ -80,7 +81,7 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
                 msg.getSubscriberSet().add(subId);
             }
         }
-        System.out.println("Regisitered subscriber to Topic   " + topic);
+        System.out.println("Registered subscriber to Topic   " + topic);
         return subId;
     }
 
@@ -88,23 +89,26 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
     // gets next outstanding message for a subscription
     public synchronized String getLatestContent(String subscriberID) throws RemoteException {
         String topic = subscriberToTopic.get(subscriberID);
-        System.out.println("Size of topic queue " + topicQueues.size());
+        System.out.println("Size of topic queue for topic " + topic + "is "+ topicQueues.get(topic).size());
         if (!topicQueues.containsKey(topic)) {
             System.out.println("There are no messages for this topic yet");
             return null;
         }
         String message = "";
-        System.out.println("There are messages");
         for (BSDSContent msg : topicQueues.get(topic)) {
             if (msg.getSubscriberSet().contains(subscriberID)) {
                 message = msg.getMessage();
                 msg.getSubscriberSet().remove(subscriberID);
+                if(msg.getSubscriberSet().size()<1) {
+                    System.out.println("************* Deleting message from server *************");
+                    topicQueues.get(topic).remove(msg);
+                }
                 System.out.println("returning latest content from queue on topic " + topic);
                 return message;
             }
         }
 
-        System.out.println("queue is empty for topic" + topic);
+        System.out.println("No new messages" + topic);
         return null;
     }
 

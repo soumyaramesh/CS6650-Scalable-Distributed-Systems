@@ -7,6 +7,8 @@ package BSDSAssignment1;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 /**
  *
@@ -18,6 +20,7 @@ public class CASubClient {
     private CASubClient() {}
 
     public static void main(String[] args) {
+        CyclicBarrier barrier1 = new CyclicBarrier(3);
         int nmcount = 0;
         int smcount = 0;
         String host = (args.length < 1) ? null : args[0];
@@ -31,10 +34,21 @@ public class CASubClient {
             System.out.println("Sub id = " + id1);
             String id2 = CAServerStub.registerSubscriber("News");
             System.out.println("Sub id = " + id2);
-            Thread th1 = new Thread(new CASubClientThread(CAServerStub,id1,smcount));
-            Thread th2 = new Thread(new CASubClientThread(CAServerStub,id2,nmcount));
+
+            Thread th1 = new Thread(new CASubClientThread(CAServerStub,id1,smcount,barrier1));
+            Thread th2 = new Thread(new CASubClientThread(CAServerStub,id2,nmcount,barrier1));
             th1.start();
             th2.start();
+
+            try {
+                barrier1.await();
+                System.out.println("NMCount = " + nmcount);
+                System.out.println("SMCount = " + smcount);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (BrokenBarrierException e) {
+                e.printStackTrace();
+            }
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();

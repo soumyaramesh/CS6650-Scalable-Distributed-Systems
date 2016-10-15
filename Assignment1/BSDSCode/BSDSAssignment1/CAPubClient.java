@@ -37,11 +37,13 @@ public class CAPubClient {
             String id3 = CAServerStub.registerPublisher("Publisher3", "News");
             System.out.println("Registered Pub id = " + id3);
 
-            for (int i = 1; i < 6; i++) {
-                CAServerStub.publishContent(id1, "Title1", "Pub1SoccerMessage " + i, 30);
-                CAServerStub.publishContent(id2, "Title2", "Pub2SoccerMessage " + i, 30);
-                CAServerStub.publishContent(id3, "Title3", "NewsMessage" + i, 30);
-            }
+            Thread th1 = new Thread(new CAPubClientThread(CAServerStub, id1,"Title","Pub1SoccerMessage ", 30, numberOfMessages ));
+            Thread th2 = new Thread(new CAPubClientThread(CAServerStub, id2,"Title","Pub2SoccerMessage ", 30, numberOfMessages ));
+            Thread th3 = new Thread(new CAPubClientThread(CAServerStub, id3,"Title","Pub1NewsMessage ", 30, numberOfMessages ));
+
+            th1.start();
+            th2.start();
+            th3.start();
 
             System.out.println("Publish Client is working");
         } catch (Exception e) {
