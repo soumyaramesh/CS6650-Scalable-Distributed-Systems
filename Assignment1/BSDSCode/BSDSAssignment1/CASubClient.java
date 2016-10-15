@@ -18,20 +18,23 @@ public class CASubClient {
     private CASubClient() {}
 
     public static void main(String[] args) {
-
+        int nmcount = 0;
+        int smcount = 0;
         String host = (args.length < 1) ? null : args[0];
         try {
-            System.out.println ("Publisher Client Starter");
+            System.out.println ("Subsriber Client Starter");
             Registry registry = LocateRegistry.getRegistry(host);
              System.out.println ("Connected to registry");
             BSDSSubscribeInterface CAServerStub = (BSDSSubscribeInterface) registry.lookup("CAServerSubscriber");
             System.out.println ("Stub initialized");
-            int id = CAServerStub.registerSubscriber("Soccer");
-            System.out.println("Pub id = " + Integer.toString(id));
-            String message = CAServerStub.getLatestContent(id);
-            
-            System.out.println("message is " + message);
-            System.out.println (" ... Looks like Subscribe Client is working too");
+            String id1 = CAServerStub.registerSubscriber("Soccer");
+            System.out.println("Sub id = " + id1);
+            String id2 = CAServerStub.registerSubscriber("News");
+            System.out.println("Sub id = " + id2);
+            Thread th1 = new Thread(new CASubClientThread(CAServerStub,id1,smcount));
+            Thread th2 = new Thread(new CASubClientThread(CAServerStub,id2,nmcount));
+            th1.start();
+            th2.start();
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();

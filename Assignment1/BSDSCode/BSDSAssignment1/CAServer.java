@@ -3,68 +3,106 @@
  */
 package BSDSAssignment1;
 
+import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
+
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 //Skeleton of CAServer supporting both BSDS interfaces
 
 public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
 
-    HashMap<Integer,String> publisherToTopic = new HashMap<>();
-    HashMap<Integer,String> subscriberToTopic = new HashMap<>();
-    HashMap<String,Queue<BSDSContent>> topicQueues = new HashMap<>();
+    private ConcurrentHashMap<String,String> publisherToTopic;
+    private ConcurrentHashMap<String,String> subscriberToTopic;
+    private ConcurrentHashMap<String,Queue<BSDSContent>> topicQueues;
+
+    public CAServer(ConcurrentHashMap<String,String> publisherToTopic,
+                    ConcurrentHashMap<String,String> subscriberToTopic,
+                    ConcurrentHashMap<String,Queue<BSDSContent>> topicQueues) {
+        this.publisherToTopic = publisherToTopic;
+        this.subscriberToTopic = subscriberToTopic;
+        this.topicQueues = topicQueues;
+    }
 
 
     // registers a publisher and returns the id
-    public int registerPublisher(String name, String topic) throws RemoteException {
+    public synchronized String registerPublisher(String name, String topic) throws RemoteException {
         System.out.println("Publisher: " + name + topic);
-        int pubId = Integer.parseInt(UUID.randomUUID().toString());
+        String pubId = UUID.randomUUID().toString();
         publisherToTopic.put(pubId,topic);
+        if(!topicQueues.containsKey(topic)) {
+            topicQueues.put(topic, new LinkedList<>());
+        }
         return pubId;
     }
 
 
     // publishes a message to the server
-    public void publishContent(int publisherID, String title, String message, int TimeToLive)
+    public synchronized void publishContent(String publisherID, String title, String message, int TimeToLive)
             throws RemoteException {
         String topic = publisherToTopic.get(publisherID);
-        if (topicQueues.get(topic).isEmpty()) {
+        System.out.println(topic);
+        if (!topicQueues.containsKey(topic)) {
             throw new NullPointerException("Could not find publisher for this topic");
         }
         else {
             topicQueues.get(topic).add(new BSDSContent(title, message, TimeToLive));
-            System.out.println("Message:" +
+            System.out.println("Published message " + " Content: " +
                     title +
                     message
             );
         }
     }
 
-    public int registerSubscriber(String topic) throws RemoteException {
+    public String registerSubscriber(String topic) throws RemoteException {
         System.out.println("Topic is  " + topic);
-        Integer subId = Integer.parseInt(UUID.randomUUID().toString());
+        String subId = UUID.randomUUID().toString();
         subscriberToTopic.put(subId,topic);
+        if(topicQueues.containsKey(topic) && !topicQueues.get(topic).isEmpty()) {
+            for (BSDSContent msg : topicQueues.get(topic)) {
+                msg.getSubscriberSet().add(subId);
+            }
+        }
         return subId;
     }
 
 
     // gets next outstanding message for a subscription
-    public String getLatestContent(int subscriberID) throws RemoteException {
-        String message = "Title: Soccer scores, Message: City win 8 straight games";
-        System.out.println("returning latest content");
-        return message;
+    public synchronized String getLatestContent(String subscriberID) throws RemoteException {
+        String topic = subscriberToTopic.get(subscriberID);
+        System.out.println("Size of topic queue " + topicQueues.size());
+        String message = "";
+        if(!topicQueues.containsKey(topic)) {
+            System.out.println("There are no messages for this topic yet");
+            return null;
+        }
+        System.out.println("There are messages");
+            for (BSDSContent msg : topicQueues.get(topic)) {
+                if (msg.getSubscriberSet().contains(subscriberID)) {
+                    message = msg.getMessage();
+                    msg.getSubscriberSet().remove(subscriberID);
+                    System.out.println("returning latest content from queue on topic " + topic);
+                    return message;
+                }
+            }
+
+        System.out.println("queue is empty for topic" + topic);
+        return null;
     }
 
     public static void main(String args[]) {
         try {
-            CAServer objPub = new CAServer();
-            CAServer objSub = new CAServer();
+            ConcurrentHashMap<String,String> publisherToTopic = new ConcurrentHashMap<>();
+            ConcurrentHashMap<String,String> subscriberToTopic = new ConcurrentHashMap<>();
+            ConcurrentHashMap<String,Queue<BSDSContent>> topicQueues = new ConcurrentHashMap<>();
+            CAServer objPub = new CAServer(publisherToTopic,subscriberToTopic,topicQueues);
+            CAServer objSub = new CAServer(publisherToTopic,subscriberToTopic,topicQueues);
             System.out.println("Server Initializing");
             BSDSPublishInterface pStub = (BSDSPublishInterface) UnicastRemoteObject.exportObject(objPub, 0);
             BSDSSubscribeInterface sStub = (BSDSSubscribeInterface) UnicastRemoteObject.exportObject(objSub, 0);

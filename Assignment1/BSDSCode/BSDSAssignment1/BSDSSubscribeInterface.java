@@ -14,8 +14,8 @@ import java.rmi.RemoteException;
  */
 public interface BSDSSubscribeInterface extends Remote {
     // registers a new subscriber and resturns a dubscriber id
-    int registerSubscriber (String topic) throws RemoteException;
+    String registerSubscriber (String topic) throws RemoteException;
 
     // gets next outstanding message for a subscription
-    String getLatestContent(int subscriberID) throws RemoteException;
+    String getLatestContent(String subscriberID) throws RemoteException;
 }

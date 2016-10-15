@@ -4,17 +4,23 @@
 package BSDSAssignment1;
 // Contains content for message publication
 
+import java.util.HashSet;
+
 public class BSDSContent {
     final static int len = 140;
     private String title;
     private String message;
     private int timeToLIve;
+    private HashSet<String> subscriberSet;
 
     public BSDSContent(String title, String message, int timeToLive) {
         this.setTitle(title);
         this.setMessage(message);
         this.setTimeToLIve(timeToLive);
+        this.subscriberSet = new HashSet<>();
     }
+
+
 
     public String getTitle() {
         return title;
@@ -38,5 +44,14 @@ public class BSDSContent {
 
     public void setTimeToLIve(int timeToLIve) {
         this.timeToLIve = timeToLIve;
+    }
+
+
+    public HashSet<String> getSubscriberSet() {
+        return subscriberSet;
+    }
+
+    public void setSubscriberSet(HashSet<String> subscriberSet) {
+        this.subscriberSet = subscriberSet;
     }
 }
