@@ -13,11 +13,11 @@ public class BSDSContent {
     private int timeToLIve;
     private HashSet<String> subscriberSet;
 
-    public BSDSContent(String title, String message, int timeToLive) {
+    public BSDSContent(String title, String message, int timeToLive, HashSet<String> subscriberSet) {
         this.setTitle(title);
         this.setMessage(message);
         this.setTimeToLIve(timeToLive);
-        this.subscriberSet = new HashSet<>();
+        this.subscriberSet = subscriberSet;
     }
 
 
