@@ -24,7 +24,7 @@ public class CASubClientThread implements Runnable {
         String msg;
         int n =1;
         try {
-            while(n<10) {
+            while(n<100) {
                 if((msg = CAServerStub.getLatestContent(subId)) != null) {
                     count ++;
                     System.out.println("Received message = " + msg);
@@ -42,19 +42,18 @@ public class CASubClientThread implements Runnable {
                 }
             }
             System.out.println("Timeout reached");
-            System.out.println("Count at the end of the thread = " + count);
-
+            System.out.println("Count at end of thread " + Thread.currentThread() + " = " + count);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
 
         try {
             barrier.await();
-            System.out.println("Count at end of thread " + Thread.currentThread() + " = " + count);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (BrokenBarrierException e) {
             e.printStackTrace();
         }
+        System.out.println("Count at end of thread after timeout " + Thread.currentThread() + " = " + count);
     }
 }

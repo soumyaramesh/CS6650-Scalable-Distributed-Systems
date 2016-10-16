@@ -13,13 +13,18 @@ public class BSDSContent {
     private int timeToLIve;
 
 
+
+    private long currentTimeMillis;
+
+
     private int deliveredCount;
 
-    public BSDSContent(String title, String message, int timeToLive, int deliveredCount) {
+    public BSDSContent(String title, String message, int timeToLive, int deliveredCount, long currentTimeMillis) {
         this.setTitle(title);
         this.setMessage(message);
         this.setTimeToLIve(timeToLive);
         this.setDeliveredCount(deliveredCount);
+        this.setCurrentTimeMillis(currentTimeMillis);
     }
 
 
@@ -55,4 +60,13 @@ public class BSDSContent {
     public void setDeliveredCount(int deliveredCount) {
         this.deliveredCount = deliveredCount;
     }
+
+    public long getCurrentTimeMillis() {
+        return currentTimeMillis;
+    }
+
+    public synchronized void setCurrentTimeMillis(long currentTimeMillis) {
+        this.currentTimeMillis = currentTimeMillis;
+    }
+
 }

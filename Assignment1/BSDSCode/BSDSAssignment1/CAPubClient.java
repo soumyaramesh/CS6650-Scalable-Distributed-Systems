@@ -38,6 +38,14 @@ public class CAPubClient {
             System.out.println("Registered Pub id = " + id2);
             String id3 = CAServerStub.registerPublisher("Publisher3", "News");
             System.out.println("Registered Pub id = " + id3);
+            String id4 = CAServerStub.registerPublisher("Publisher4", "Junk");
+            System.out.println("Registered Pub id = " + id4);
+
+            Thread.sleep(10000);
+
+            for(int i=0;i<numberOfMessages;i++) {
+                CAServerStub.publishContent(id4,"Title","Pub4JunkMessage",30);
+            }
 
             Thread th1 = new Thread(new CAPubClientThread(CAServerStub, id1,"Title","Pub1SoccerMessage ", 30, numberOfMessages ));
             Thread th2 = new Thread(new CAPubClientThread(CAServerStub, id2,"Title","Pub2SoccerMessage ", 30, numberOfMessages ));
@@ -49,7 +57,7 @@ public class CAPubClient {
 
             System.out.println("Publish Client is working");
         } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
+            System.err.println("Publisher Client exception: " + e.toString());
             e.printStackTrace();
         }
     }

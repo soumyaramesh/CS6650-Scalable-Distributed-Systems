@@ -20,7 +20,7 @@ public class CASubClient {
     private CASubClient() {}
 
     public static void main(String[] args) {
-        CyclicBarrier barrier1 = new CyclicBarrier(3);
+        CyclicBarrier barrier1 = new CyclicBarrier(2);
         int nmcount = 0;
         int smcount = 0;
         String host = (args.length < 1) ? null : args[0];
@@ -39,18 +39,8 @@ public class CASubClient {
             Thread th2 = new Thread(new CASubClientThread(CAServerStub,id2,nmcount,barrier1));
             th1.start();
             th2.start();
-
-            try {
-                barrier1.await();
-                System.out.println("NMCount = " + nmcount);
-                System.out.println("SMCount = " + smcount);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (BrokenBarrierException e) {
-                e.printStackTrace();
-            }
         } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
+            System.err.println("Subscriber Client exception: " + e.toString());
             e.printStackTrace();
         }
     }

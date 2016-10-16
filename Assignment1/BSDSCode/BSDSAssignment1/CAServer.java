@@ -8,25 +8,25 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 //Skeleton of CAServer supporting both BSDS interfaces
 
-public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
+public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface, BSDSDiagnosticsInterface {
 
     private ConcurrentHashMap<String, String> publisherToTopic;
     private ConcurrentHashMap<String, String> subscriberToTopic;
-    private ConcurrentHashMap<String, TreeMap<Integer, BSDSContent>> topicQueues;
+    private ConcurrentHashMap<String, ConcurrentSkipListMap<Integer, BSDSContent>> topicQueues;
     private ConcurrentHashMap<String, Integer> topicToLastSeqNo;
     private ConcurrentHashMap<String, Integer> subscriberToLastSeenSeqNo;
-    private ConcurrentHashMap<String,Integer> topicToSubscriberCount;
+    private ConcurrentHashMap<String, Integer> topicToSubscriberCount;
 
     public CAServer(ConcurrentHashMap<String, String> publisherToTopic,
                     ConcurrentHashMap<String, String> subscriberToTopic,
-                    ConcurrentHashMap<String, TreeMap<Integer, BSDSContent>> topicQueues,
+                    ConcurrentHashMap<String, ConcurrentSkipListMap<Integer, BSDSContent>> topicQueues,
                     ConcurrentHashMap<String, Integer> topicToLastSeqNo,
                     ConcurrentHashMap<String, Integer> subscriberToLastSeenSeqNo,
-                    ConcurrentHashMap<String,Integer> topicToSubscriberCount) {
+                    ConcurrentHashMap<String, Integer> topicToSubscriberCount) {
         this.publisherToTopic = publisherToTopic;
         this.subscriberToTopic = subscriberToTopic;
         this.topicQueues = topicQueues;
@@ -42,10 +42,10 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
         String pubId = UUID.randomUUID().toString();
         publisherToTopic.put(pubId, topic);
         if (!topicQueues.containsKey(topic)) {
-            topicQueues.put(topic, new TreeMap<>());
+            topicQueues.put(topic, new ConcurrentSkipListMap<>());
         }
         topicToLastSeqNo.put(topic, 0);
-        topicToSubscriberCount.put(topic,0);
+        topicToSubscriberCount.put(topic, 0);
         return pubId;
     }
 
@@ -54,9 +54,9 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
     public synchronized void publishContent(String publisherID, String title, String message, int TimeToLive)
             throws RemoteException {
         String topic = publisherToTopic.get(publisherID);
-        TreeMap<Integer, BSDSContent> topicQueue = topicQueues.get(topic);
+        ConcurrentSkipListMap<Integer, BSDSContent> topicQueue = topicQueues.get(topic);
         int newSeqNo = topicToLastSeqNo.get(topic) + 1;
-        topicQueue.put(newSeqNo, new BSDSContent(title, message, TimeToLive,0));
+        topicQueue.put(newSeqNo, new BSDSContent(title, message, TimeToLive, 0, System.currentTimeMillis()));
         topicToLastSeqNo.put(topic, newSeqNo);
         System.out.println("Published message " + newSeqNo + " Content: " +
                 title +
@@ -70,7 +70,7 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
         subscriberToTopic.put(subId, topic);
         subscriberToLastSeenSeqNo.put(subId, 0);
         int subCount = topicToSubscriberCount.get(topic);
-        topicToSubscriberCount.put(topic,subCount+1);
+        topicToSubscriberCount.put(topic, subCount + 1);
         System.out.println("Registered subscriber to Topic " + topic);
         return subId;
     }
@@ -85,13 +85,15 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
             System.out.println("There are no messages published for this topic yet");
             return null;
         }
-        TreeMap<Integer, BSDSContent> topicQueue = topicQueues.get(topic);
-        if(topicQueue.ceilingKey(lastSeenSeq) == null) {
+        ConcurrentSkipListMap<Integer, BSDSContent> topicQueue = topicQueues.get(topic);
+        if (topicQueue.ceilingKey(lastSeenSeq) == null) {
             System.out.println("No more new messages for this topic yet. Ask again later");
             return null;
-        }
-        else {
+        } else {
             int nextMessageSeq = topicQueue.ceilingKey(lastSeenSeq);
+            if(!topicQueue.containsKey(nextMessageSeq)) {
+                System.out.println("WHAAAAA");
+            }
             BSDSContent nextMessage = topicQueue.get(nextMessageSeq);
             int updatedDeliveredCount = nextMessage.getDeliveredCount() + 1;
             if (updatedDeliveredCount == topicToSubscriberCount.get(topic)) {
@@ -101,29 +103,49 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
                 nextMessage.setDeliveredCount(updatedDeliveredCount);
                 topicQueues.get(topic).put(nextMessageSeq, nextMessage);
             }
+            subscriberToLastSeenSeqNo.put(subscriberID,nextMessageSeq);
             System.out.println("returning latest content from queue on topic " + topic);
 
             return nextMessage.getMessage();
         }
     }
 
+    @Override
+    public synchronized HashMap<String,Integer> getNumberOfMessagesInQueue() throws RemoteException {
+        HashMap<String,Integer> topicQueueLen = new HashMap<>();
+        for (String topic:topicQueues.keySet()) {
+            topicQueueLen.put(topic,topicQueues.get(topic).size());
+        }
+        return topicQueueLen;
+    }
+
+    @Override
+    public synchronized int getNumberOfMessagesInQueue(String topic) throws RemoteException {
+        return topicQueues.get(topic).size();
+    }
+
+
 
     public static void main(String args[]) {
         try {
             ConcurrentHashMap<String, String> publisherToTopic = new ConcurrentHashMap<>();
             ConcurrentHashMap<String, String> subscriberToTopic = new ConcurrentHashMap<>();
-            ConcurrentHashMap<String, TreeMap<Integer, BSDSContent>> topicQueues = new ConcurrentHashMap<>();
+            ConcurrentHashMap<String, ConcurrentSkipListMap<Integer, BSDSContent>> topicQueues = new ConcurrentHashMap<>();
             ConcurrentHashMap<String, Integer> topicToLastSeqNo = new ConcurrentHashMap<>();
             ConcurrentHashMap<String, Integer> subscriberToLastSeenSeqNo = new ConcurrentHashMap<>();
-            ConcurrentHashMap<String,Integer> topicToSubscriberCount = new ConcurrentHashMap<>();
+            ConcurrentHashMap<String, Integer> topicToSubscriberCount = new ConcurrentHashMap<>();
 
             CAServer objPub = new CAServer(publisherToTopic, subscriberToTopic, topicQueues,
-                    topicToLastSeqNo, subscriberToLastSeenSeqNo,topicToSubscriberCount);
+                    topicToLastSeqNo, subscriberToLastSeenSeqNo, topicToSubscriberCount);
             CAServer objSub = new CAServer(publisherToTopic, subscriberToTopic, topicQueues,
                     topicToLastSeqNo, subscriberToLastSeenSeqNo, topicToSubscriberCount);
+            CAServer objDiagnostics = new CAServer(publisherToTopic, subscriberToTopic, topicQueues,
+                    topicToLastSeqNo, subscriberToLastSeenSeqNo, topicToSubscriberCount);
+
             System.out.println("Server Initializing");
             BSDSPublishInterface pStub = (BSDSPublishInterface) UnicastRemoteObject.exportObject(objPub, 0);
             BSDSSubscribeInterface sStub = (BSDSSubscribeInterface) UnicastRemoteObject.exportObject(objSub, 0);
+            BSDSDiagnosticsInterface dStub = (BSDSDiagnosticsInterface) UnicastRemoteObject.exportObject(objDiagnostics,0);
             System.out.println("stubs created ....");
             // Bind the remote object's stub in the local host registry
             LocateRegistry.createRegistry(1099);
@@ -133,13 +155,24 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
             try {
                 registry.bind("CAServerPublisher", pStub);
                 registry.bind("CAServerSubscriber", sStub);
+                registry.bind("CAServerDiagnostics", dStub);
             } catch (Exception e) {
                 System.out.println("Caught already bound exception, probably safe to continue in dev mode" + e.toString());
             }
             System.err.println("CAServer ready");
+
+            ScheduledExecutorService execService = Executors.newScheduledThreadPool(1);
+            execService.scheduleAtFixedRate(new DeleteExpiredMessagesThread(topicQueues), 20,5,TimeUnit.SECONDS);
+//            execService.scheduleAtFixedRate(() -> {
+//                execService.execute(new DeleteExpiredMessagesThread(topicQueues));
+//            },10,5, TimeUnit.SECONDS);
+//            Thread th = new Thread(new DeleteExpiredMessagesThread(topicQueues));
+//            th.start();
+
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
         }
     }
+
 }
