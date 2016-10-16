@@ -11,13 +11,15 @@ public class BSDSContent {
     private String title;
     private String message;
     private int timeToLIve;
-    private HashSet<String> subscriberSet;
 
-    public BSDSContent(String title, String message, int timeToLive, HashSet<String> subscriberSet) {
+
+    private int deliveredCount;
+
+    public BSDSContent(String title, String message, int timeToLive, int deliveredCount) {
         this.setTitle(title);
         this.setMessage(message);
         this.setTimeToLIve(timeToLive);
-        this.subscriberSet = subscriberSet;
+        this.setDeliveredCount(deliveredCount);
     }
 
 
@@ -46,12 +48,11 @@ public class BSDSContent {
         this.timeToLIve = timeToLIve;
     }
 
-
-    public HashSet<String> getSubscriberSet() {
-        return subscriberSet;
+    public int getDeliveredCount() {
+        return deliveredCount;
     }
 
-    public void setSubscriberSet(HashSet<String> subscriberSet) {
-        this.subscriberSet = subscriberSet;
+    public void setDeliveredCount(int deliveredCount) {
+        this.deliveredCount = deliveredCount;
     }
 }

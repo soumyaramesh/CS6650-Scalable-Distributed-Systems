@@ -25,7 +25,7 @@ public class CASubClient {
         int smcount = 0;
         String host = (args.length < 1) ? null : args[0];
         try {
-            System.out.println ("Subsriber Client Starter");
+            System.out.println ("Subscriber Client Starter");
             Registry registry = LocateRegistry.getRegistry(host);
              System.out.println ("Connected to registry");
             BSDSSubscribeInterface CAServerStub = (BSDSSubscribeInterface) registry.lookup("CAServerSubscriber");

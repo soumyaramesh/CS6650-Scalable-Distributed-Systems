@@ -5,5 +5,7 @@ import java.rmi.RemoteException;
 /**
  * Created by soumya on 10/15/16.
  */
-public class BSDSDiagnosticsInterface {
+public interface BSDSDiagnosticsInterface extends Remote{
+
+    int getNumberOfMessagesInQueue(String topic) throws RemoteException;
 }

@@ -10,7 +10,7 @@ import java.rmi.RemoteException;
 
 
 public interface BSDSPublishInterface extends Remote{
-    // returns unique publisherID. Each publisher publishes messages on a single topic
+    // returns unique publisherID. Each publisher publishes messaages on a single topic
     String registerPublisher(String name, String topic) throws RemoteException;
 
     // publishes a message to the server

@@ -13,6 +13,7 @@ package BSDSAssignment1;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 
 // Simple client to test publishing to CAServer over RMI
 
@@ -25,6 +26,7 @@ public class CAPubClient {
         String host = (args.length < 1) ? null : args[0];
         int numberOfMessages = 10000;
         try {
+
             System.out.println ("Publisher Client Starter");
             Registry registry = LocateRegistry.getRegistry(host, 1099);
              System.out.println ("Connected to registry");
