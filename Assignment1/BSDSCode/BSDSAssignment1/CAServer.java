@@ -90,20 +90,19 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface, B
             System.out.println("No more new messages for this topic yet. Ask again later");
             return null;
         } else {
-            int nextMessageSeq = topicQueue.ceilingKey(lastSeenSeq);
-            if(!topicQueue.containsKey(nextMessageSeq)) {
-                System.out.println("WHAAAAA");
-            }
-            BSDSContent nextMessage = topicQueue.get(nextMessageSeq);
+            int curMessageSeq = topicQueue.ceilingKey(lastSeenSeq);
+            BSDSContent nextMessage = topicQueue.get(curMessageSeq);
             int updatedDeliveredCount = nextMessage.getDeliveredCount() + 1;
             if (updatedDeliveredCount == topicToSubscriberCount.get(topic)) {
                 System.out.println("*********** Deleting message from server ***********");
-                topicQueues.get(topic).remove(nextMessageSeq);
+                topicQueue.remove(curMessageSeq);
+                topicQueues.put(topic,topicQueue);
             } else {
                 nextMessage.setDeliveredCount(updatedDeliveredCount);
-                topicQueues.get(topic).put(nextMessageSeq, nextMessage);
+                topicQueue.put(curMessageSeq, nextMessage);
+                topicQueues.put(topic,topicQueue);
             }
-            subscriberToLastSeenSeqNo.put(subscriberID,nextMessageSeq);
+            subscriberToLastSeenSeqNo.put(subscriberID,curMessageSeq);
             System.out.println("returning latest content from queue on topic " + topic);
 
             return nextMessage.getMessage();
