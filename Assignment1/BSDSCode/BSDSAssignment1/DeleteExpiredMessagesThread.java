@@ -2,7 +2,6 @@ package BSDSAssignment1;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.*;
 
 /**
@@ -23,7 +22,6 @@ public class DeleteExpiredMessagesThread implements Runnable {
 
     @Override
     public void run() {
-        //ScheduledExecutorService execService = Executors.newScheduledThreadPool(topicQueues.size());
         if (topicQueues.keySet().size() > 1) {
             System.out.println("In delete thread!!");
             ExecutorService executor = Executors.newFixedThreadPool(topicQueues.size());
@@ -51,20 +49,5 @@ public class DeleteExpiredMessagesThread implements Runnable {
         else {
             System.out.println("No topics in queue to monitor");
         }
-
-
-//            execService.scheduleAtFixedRate(() -> {
-//                for(Map.Entry<Integer,BSDSContent> entry : topicQueue.entrySet()) {
-//                    Integer key = entry.getKey();
-//                    BSDSContent msg = entry.getValue();
-//                    if (System.currentTimeMillis() - msg.getCurrentTimeMillis() > 2000) {
-//                        System.out.println("EXPIRED!!!!! " + msg.getMessage());
-//                        topicQueue.remove(key);
-//                        expiredCount ++;
-//                    }
-//                }
-//            }, 10, 5, TimeUnit.SECONDS);
-
-
     }
 }

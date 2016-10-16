@@ -163,11 +163,6 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface, B
 
             ScheduledExecutorService execService = Executors.newScheduledThreadPool(1);
             execService.scheduleAtFixedRate(new DeleteExpiredMessagesThread(topicQueues), 20,5,TimeUnit.SECONDS);
-//            execService.scheduleAtFixedRate(() -> {
-//                execService.execute(new DeleteExpiredMessagesThread(topicQueues));
-//            },10,5, TimeUnit.SECONDS);
-//            Thread th = new Thread(new DeleteExpiredMessagesThread(topicQueues));
-//            th.start();
 
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
