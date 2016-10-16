@@ -27,7 +27,7 @@ public class CADiagnosticsClient {
             System.out.println ("Connected to registry");
             BSDSDiagnosticsInterface CAServerStub = (BSDSDiagnosticsInterface) registry.lookup("CAServerDiagnostics");
             System.out.println ("Stub initialized");
-            ScheduledExecutorService execService = Executors.newScheduledThreadPool(1);
+            ScheduledExecutorService execService = Executors.newSingleThreadScheduledExecutor();
             execService.scheduleAtFixedRate(() -> {
                 HashMap<String,Integer> topicQueueLen = null;
                 try {
@@ -41,7 +41,7 @@ public class CADiagnosticsClient {
                     System.out.println(pair.getKey() + " = " + pair.getValue());
                     it.remove();
                 }
-            }, 0,5, TimeUnit.SECONDS);
+            }, 5,1, TimeUnit.SECONDS);
         }
         catch (Exception e) {
             System.err.println("Diagnostics Client exception: " + e.toString());

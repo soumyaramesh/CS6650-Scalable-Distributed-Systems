@@ -24,7 +24,7 @@ public class DeleteExpiredMessagesThread implements Runnable {
     public void run() {
         if (topicQueues.keySet().size() > 1) {
             System.out.println("In delete thread!!");
-            ExecutorService executor = Executors.newFixedThreadPool(topicQueues.size());
+            ExecutorService executor = Executors.newCachedThreadPool();
             for (String topic : topicQueues.keySet()) {
                 Map<Integer, BSDSContent> topicQueue = Collections.synchronizedMap(topicQueues.get(topic));
                 if(topicQueue.size()<1) {
@@ -36,7 +36,7 @@ public class DeleteExpiredMessagesThread implements Runnable {
                         for (Map.Entry<Integer, BSDSContent> entry : topicQueue.entrySet()) {
                             Integer key = entry.getKey();
                             BSDSContent msg = entry.getValue();
-                            if (System.currentTimeMillis() - msg.getCurrentTimeMillis() > 30000) {
+                            if (System.currentTimeMillis() - msg.getCurrentTimeMillis() > 50000) {
                                 System.out.println("EXPIRED!!!!! " + msg.getMessage());
                                 topicQueue.remove(key);
                                 expiredCount++;

@@ -79,6 +79,9 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface, B
     // gets next outstanding message for a subscription
     public synchronized String getLatestContent(String subscriberID) throws RemoteException {
         String topic = subscriberToTopic.get(subscriberID);
+        if(topic == null) {
+            throw new RemoteException("Couldn't find topic for this subscriber ID");
+        }
         int lastSeenSeq = subscriberToLastSeenSeqNo.get(subscriberID);
         System.out.println("Size of topic queue for topic " + topic + "is " + topicQueues.get(topic).size());
         if (!topicQueues.containsKey(topic)) {
@@ -160,8 +163,8 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface, B
             }
             System.err.println("CAServer ready");
 
-            ScheduledExecutorService execService = Executors.newScheduledThreadPool(1);
-            execService.scheduleAtFixedRate(new DeleteExpiredMessagesThread(topicQueues), 20,5,TimeUnit.SECONDS);
+            ScheduledExecutorService execService = Executors.newSingleThreadScheduledExecutor();
+            execService.scheduleAtFixedRate(new DeleteExpiredMessagesThread(topicQueues), 25,10,TimeUnit.SECONDS);
 
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());

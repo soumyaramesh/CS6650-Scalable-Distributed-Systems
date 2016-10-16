@@ -12,19 +12,18 @@ public class CASubClientThread implements Runnable {
     private String subId;
     private int count;
     private CyclicBarrier barrier;
-    public CASubClientThread(BSDSSubscribeInterface CAServerStub, String subId, int count, CyclicBarrier barrier) {
+    public CASubClientThread(BSDSSubscribeInterface CAServerStub, String subId, CyclicBarrier barrier) {
         this.CAServerStub = CAServerStub;
         this.subId = subId;
-        this.count = count;
         this.barrier = barrier;
     }
 
     @Override
     public void run() {
         String msg;
-        int n =1;
+        int n = 1;
         try {
-            while(n<100) {
+            while(n<40) {
                 if((msg = CAServerStub.getLatestContent(subId)) != null) {
                     count ++;
                     System.out.println("Received message = " + msg);
@@ -42,7 +41,6 @@ public class CASubClientThread implements Runnable {
                 }
             }
             System.out.println("Timeout reached");
-            System.out.println("Count at end of thread " + Thread.currentThread() + " = " + count);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
