@@ -1,5 +1,14 @@
 BSDS Assignment 1 
 
+Run Instructions -
+
+When the code is run with no arguments, the default number of publisher threads are 20, subscribers are 10 and TTL is 90
+seconds.
+
+CAServer
+CAPubClient <numberOfMessages> <publisherThreads> <host>
+CASubClient <subscriberThreads> <host>
+
 Remote interfaces are:
   BSDSPublishInterface
   BSDSSubscribeInterface
@@ -19,5 +28,3 @@ Also there are:
   BSDSContent
   BSDSMessage
   
-When the code is run with no arguments, the default number of publisher threads are 20, subscribers are 10 and TTL is 90
-seconds.
