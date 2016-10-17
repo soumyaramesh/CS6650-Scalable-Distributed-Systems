@@ -26,7 +26,7 @@ public class CAPubClient {
 
         String host = (args.length < 1) ? null : args[0];
         int numberOfMessages = (args.length < 2) ? 10000 : Integer.parseInt(args[1]);
-        int publisherThreads = (args.length < 3) ? 10 : Integer.parseInt(args[1]);
+        int publisherThreads = (args.length < 3) ? 20 : Integer.parseInt(args[1]);
         long start = System.nanoTime();
         try {
 
