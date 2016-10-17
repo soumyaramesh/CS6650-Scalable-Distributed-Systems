@@ -19,9 +19,11 @@ public class CASubClient {
     private CASubClient() {}
 
     public static void main(String[] args) {
-        int subThreads = (args.length < 2) ? 10 : Integer.parseInt(args[1]);
+        int subThreads = (args.length < 1) ? 10 : Integer.parseInt(args[0]);
+        String host = (args.length < 2) ? null : args[1];
+        System.out.println("Subscriber Threads = " + subThreads);
         CyclicBarrier barrier = new CyclicBarrier(subThreads + 1);
-        String host = (args.length < 1) ? null : args[0];
+
         try {
             System.out.println ("Subscriber Client Starter");
             Registry registry = LocateRegistry.getRegistry(host);

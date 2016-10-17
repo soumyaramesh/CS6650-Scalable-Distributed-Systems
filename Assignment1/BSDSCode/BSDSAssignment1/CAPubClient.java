@@ -24,9 +24,12 @@ public class CAPubClient {
     public static void main(String[] args) {
         CyclicBarrier barrier = new CyclicBarrier(20);
 
-        String host = (args.length < 1) ? null : args[0];
-        int numberOfMessages = (args.length < 2) ? 10000 : Integer.parseInt(args[1]);
-        int publisherThreads = (args.length < 3) ? 20 : Integer.parseInt(args[1]);
+
+        int numberOfMessages = (args.length < 1) ? 10000 : Integer.parseInt(args[0]);
+        int publisherThreads = (args.length < 2) ? 20 : Integer.parseInt(args[1]);
+        String host = (args.length < 3) ? null : args[2];
+        System.out.println("Number of messages  = " + numberOfMessages);
+        System.out.println("number of pub threads = " + publisherThreads);
         long start = System.nanoTime();
         try {
 
