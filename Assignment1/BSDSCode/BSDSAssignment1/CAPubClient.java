@@ -77,7 +77,7 @@ public class CAPubClient {
             String id20 = CAServerStub.registerPublisher("Publisher20", "Funny");
             System.out.println("Registered Pub id = " + id20);
 
-            Thread.sleep(10000);
+            Thread.sleep(5000);
 
             new Thread(new CAPubClientThread(CAServerStub, id1,"Title","SoccerMessage ", 30, numberOfMessages,barrier )).start();
             new Thread(new CAPubClientThread(CAServerStub, id2,"Title","SoccerMessage ", 30, numberOfMessages,barrier )).start();

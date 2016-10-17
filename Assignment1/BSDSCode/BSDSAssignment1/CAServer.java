@@ -78,8 +78,9 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface, B
 
     // gets next outstanding message for a subscription
     public synchronized String getLatestContent(String subscriberID) throws RemoteException {
+        String msg = "";
         String topic = subscriberToTopic.get(subscriberID);
-        if(topic == null) {
+        if (topic == null) {
             throw new RemoteException("Couldn't find topic for this subscriber ID");
         }
         int lastSeenSeq = subscriberToLastSeenSeqNo.get(subscriberID);
@@ -93,30 +94,36 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface, B
             System.out.println("No more new messages for this topic yet. Ask again later");
             return null;
         } else {
-            int curMessageSeq = topicQueue.ceilingKey(lastSeenSeq);
-            BSDSContent nextMessage = topicQueue.get(curMessageSeq);
-            int updatedDeliveredCount = nextMessage.getDeliveredCount() + 1;
-            if (updatedDeliveredCount == topicToSubscriberCount.get(topic)) {
-                System.out.println("*********** Deleting message from server ***********");
-                topicQueue.remove(curMessageSeq);
-                topicQueues.put(topic,topicQueue);
-            } else {
-                nextMessage.setDeliveredCount(updatedDeliveredCount);
-                topicQueue.put(curMessageSeq, nextMessage);
-                topicQueues.put(topic,topicQueue);
+
+            try {
+                int curMessageSeq = topicQueue.ceilingKey(lastSeenSeq);
+                BSDSContent nextMessage = topicQueue.get(curMessageSeq);
+                int updatedDeliveredCount = nextMessage.getDeliveredCount() + 1;
+                if (updatedDeliveredCount == topicToSubscriberCount.get(topic)) {
+                    System.out.println("*********** Deleting message from server ***********");
+                    topicQueue.remove(curMessageSeq);
+                    topicQueues.put(topic, topicQueue);
+                } else {
+                    nextMessage.setDeliveredCount(updatedDeliveredCount);
+                    topicQueue.put(curMessageSeq, nextMessage);
+                    topicQueues.put(topic, topicQueue);
+                }
+                subscriberToLastSeenSeqNo.put(subscriberID, curMessageSeq);
+                msg = nextMessage.getMessage();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            subscriberToLastSeenSeqNo.put(subscriberID,curMessageSeq);
             System.out.println("returning latest content from queue on topic " + topic);
 
-            return nextMessage.getMessage();
+            return msg;
         }
     }
 
     @Override
-    public synchronized HashMap<String,Integer> getNumberOfMessagesInQueue() throws RemoteException {
-        HashMap<String,Integer> topicQueueLen = new HashMap<>();
-        for (String topic:topicQueues.keySet()) {
-            topicQueueLen.put(topic,topicQueues.get(topic).size());
+    public synchronized HashMap<String, Integer> getNumberOfMessagesInQueue() throws RemoteException {
+        HashMap<String, Integer> topicQueueLen = new HashMap<>();
+        for (String topic : topicQueues.keySet()) {
+            topicQueueLen.put(topic, topicQueues.get(topic).size());
         }
         return topicQueueLen;
     }
@@ -125,7 +132,6 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface, B
     public synchronized int getNumberOfMessagesInQueue(String topic) throws RemoteException {
         return topicQueues.get(topic).size();
     }
-
 
 
     public static void main(String args[]) {
@@ -164,8 +170,7 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface, B
             System.err.println("CAServer ready");
 
             ScheduledExecutorService execService = Executors.newSingleThreadScheduledExecutor();
-            execService.scheduleAtFixedRate(new DeleteExpiredMessagesThread(topicQueues), 25,10,TimeUnit.SECONDS);
-
+            execService.scheduleAtFixedRate(new DeleteExpiredMessagesThread(topicQueues),5,1,TimeUnit.SECONDS);
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
