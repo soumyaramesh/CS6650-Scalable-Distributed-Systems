@@ -22,7 +22,7 @@ public class CASubClient {
         int subThreads = (args.length < 1) ? 10 : Integer.parseInt(args[0]);
         String host = (args.length < 2) ? null : args[1];
         System.out.println("Subscriber Threads = " + subThreads);
-        CyclicBarrier barrier = new CyclicBarrier(subThreads + 1);
+        CyclicBarrier barrier = new CyclicBarrier(10 + 1);
 
         try {
             System.out.println ("Subscriber Client Starter");
