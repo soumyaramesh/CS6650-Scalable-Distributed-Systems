@@ -1,8 +1,10 @@
 package BSDSAssignment1;
 
+import java.io.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.security.Timestamp;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -22,6 +24,8 @@ public class CADiagnosticsClient {
     public static void main(String args[]) {
         String host = (args.length < 1) ? null : args[0];
         try {
+//            PrintStream out = new PrintStream(new FileOutputStream("TTL70QueueLen.txt"));
+//            System.setOut(out);
             System.out.println ("Diagnostics Client Starter");
             Registry registry = LocateRegistry.getRegistry(host);
             System.out.println ("Connected to registry");
