@@ -36,7 +36,7 @@ public class DeleteExpiredMessagesThread implements Runnable {
                         for (Map.Entry<Integer, BSDSContent> entry : topicQueue.entrySet()) {
                             Integer key = entry.getKey();
                             BSDSContent msg = entry.getValue();
-                            if (System.currentTimeMillis() - msg.getCurrentTimeMillis() > 70000) {
+                            if (System.currentTimeMillis() - msg.getCurrentTimeMillis() > 90000) {
                                 System.out.println("EXPIRED!!!!! " + msg.getMessage());
                                 topicQueue.remove(key);
                                 expiredCount++;

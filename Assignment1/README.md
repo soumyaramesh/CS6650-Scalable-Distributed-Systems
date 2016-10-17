@@ -19,4 +19,5 @@ Also there are:
   BSDSContent
   BSDSMessage
   
-We'll use these in a later assignment  
+When the code is run with no arguments, the default number of publisher threads are 20, subscribers are 10 and TTL is 90
+seconds.

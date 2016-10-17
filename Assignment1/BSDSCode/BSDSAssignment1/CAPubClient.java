@@ -13,9 +13,7 @@ package BSDSAssignment1;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.UUID;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.Executor;
+import java.util.concurrent.*;
 
 // Simple client to test publishing to CAServer over RMI
 
@@ -27,7 +25,8 @@ public class CAPubClient {
         CyclicBarrier barrier = new CyclicBarrier(20);
 
         String host = (args.length < 1) ? null : args[0];
-        int numberOfMessages = 10000;
+        int numberOfMessages = (args.length < 2) ? 10000 : Integer.parseInt(args[1]);
+        int publisherThreads = (args.length < 3) ? 10 : Integer.parseInt(args[1]);
         long start = System.nanoTime();
         try {
 
@@ -79,26 +78,50 @@ public class CAPubClient {
 
             Thread.sleep(5000);
 
-            new Thread(new CAPubClientThread(CAServerStub, id1,"Title","SoccerMessage ", 30, numberOfMessages,barrier )).start();
-            new Thread(new CAPubClientThread(CAServerStub, id2,"Title","SoccerMessage ", 30, numberOfMessages,barrier )).start();
-            new Thread(new CAPubClientThread(CAServerStub, id3,"Title","NewsMessage ", 30, numberOfMessages,barrier )).start();
-            new Thread(new CAPubClientThread(CAServerStub, id4,"Title","NewsMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id5,"Title","SportsMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id6,"Title","SportsMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id7,"Title","TravelMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id8,"Title","TravelMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id9,"Title","FoodMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id10,"Title","FoodMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id11,"Title","HikingMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id12,"Title","HikingMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id13,"Title","BostonMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id14,"Title","BostonMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id15,"Title","AsiaMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id16,"Title","AsiaMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id17,"Title","EuropeMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id18,"Title","EuropeMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id19,"Title","FunnyMessage", 30, numberOfMessages,barrier)).start();
-            new Thread(new CAPubClientThread(CAServerStub, id20,"Title","FunnyMessage", 30, numberOfMessages,barrier)).start();
+            ExecutorService executorService = Executors.newFixedThreadPool(publisherThreads);
+            executorService.execute(new CAPubClientThread(CAServerStub, id1,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id2,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id3,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id4,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id5,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id6,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id7,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id8,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id9,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id10,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id11,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id12,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id13,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id14,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id15,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id16,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id17,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id18,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id19,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+            executorService.execute(new CAPubClientThread(CAServerStub, id20,"Title","SoccerMessage ", 30, numberOfMessages,barrier ));
+
+
+
+//            new Thread(new CAPubClientThread(CAServerStub, id1,"Title","SoccerMessage ", 30, numberOfMessages,barrier )).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id2,"Title","SoccerMessage ", 30, numberOfMessages,barrier )).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id3,"Title","NewsMessage ", 30, numberOfMessages,barrier )).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id4,"Title","NewsMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id5,"Title","SportsMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id6,"Title","SportsMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id7,"Title","TravelMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id8,"Title","TravelMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id9,"Title","FoodMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id10,"Title","FoodMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id11,"Title","HikingMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id12,"Title","HikingMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id13,"Title","BostonMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id14,"Title","BostonMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id15,"Title","AsiaMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id16,"Title","AsiaMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id17,"Title","EuropeMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id18,"Title","EuropeMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id19,"Title","FunnyMessage", 30, numberOfMessages,barrier)).start();
+//            new Thread(new CAPubClientThread(CAServerStub, id20,"Title","FunnyMessage", 30, numberOfMessages,barrier)).start();
             System.out.println("Publish Client is working");
         } catch (Exception e) {
             System.err.println("Publisher Client exception: " + e.toString());

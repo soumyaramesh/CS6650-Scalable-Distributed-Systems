@@ -19,8 +19,8 @@ public class CASubClient {
     private CASubClient() {}
 
     public static void main(String[] args) {
-        int subCount = 10;
-        CyclicBarrier barrier = new CyclicBarrier(subCount + 1);
+        int subThreads = (args.length < 2) ? 10 : Integer.parseInt(args[1]);
+        CyclicBarrier barrier = new CyclicBarrier(subThreads + 1);
         String host = (args.length < 1) ? null : args[0];
         try {
             System.out.println ("Subscriber Client Starter");
@@ -52,7 +52,7 @@ public class CASubClient {
 
             long start = System.nanoTime();
 
-            ExecutorService executorService = Executors.newCachedThreadPool();
+            ExecutorService executorService = Executors.newFixedThreadPool(subThreads);
             executorService.execute(new CASubClientThread(CAServerStub,id1,barrier));
             executorService.execute(new CASubClientThread(CAServerStub,id2,barrier));
             executorService.execute(new CASubClientThread(CAServerStub,id3,barrier));
