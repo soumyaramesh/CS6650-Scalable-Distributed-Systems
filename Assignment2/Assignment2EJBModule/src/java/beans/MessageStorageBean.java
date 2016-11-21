@@ -28,7 +28,7 @@ public class MessageStorageBean implements MessageStorageBeanRemote {
     private static ConnectionFactory cf;
     @Resource(mappedName = "jms/Queue")
     private static Queue queue;
-    @PersistenceContext
+    @PersistenceContext(unitName = "Assignment2EJBModulePU")
     private EntityManager entityManager;
     
     @Override

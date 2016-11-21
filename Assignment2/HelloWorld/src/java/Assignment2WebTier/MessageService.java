@@ -22,7 +22,7 @@ import javax.ws.rs.QueryParam;
 @Path("message")
 public class MessageService {
 
-    @EJB
+    @EJB(beanName="MessageStorageBean", mappedName = "ejb/MessageStorageBeanRemote", beanInterface = MessageStorageBeanRemote.class)
     private MessageStorageBeanRemote messageStorageBean;
     
     @Path("publishContent")

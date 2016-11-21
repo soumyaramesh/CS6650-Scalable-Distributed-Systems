@@ -15,9 +15,9 @@ import javax.persistence.PersistenceContext;
  * @author Amitash
  */
 @Stateless
-public class PublisherStorageBean implements PublisherSessionBeanRemote {
+public class PublisherStorageBean implements PublisherStorageBeanRemote {
     
-    @PersistenceContext
+    @PersistenceContext(unitName = "Assignment2EJBModulePU")
     private EntityManager entityManager;
 
     @Override
@@ -34,9 +34,5 @@ public class PublisherStorageBean implements PublisherSessionBeanRemote {
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
 
-    @Override
-    public void publishContent(String publisherId, String title, String message) {
-        
-    }
     
 }

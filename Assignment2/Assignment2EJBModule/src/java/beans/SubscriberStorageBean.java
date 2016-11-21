@@ -15,12 +15,12 @@ import javax.persistence.PersistenceContext;
  * @author Amitash
  */
 @Stateless
-public class SubscriberStorageBean implements SubscriberBeanRemote {
+public class SubscriberStorageBean implements SubscriberStorageBeanRemote {
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
     
-    @PersistenceContext
+    @PersistenceContext(unitName = "Assignment2EJBModulePU")
     private EntityManager entityManager;
 
     @Override

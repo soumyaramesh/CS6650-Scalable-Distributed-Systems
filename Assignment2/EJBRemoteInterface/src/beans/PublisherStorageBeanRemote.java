@@ -5,17 +5,13 @@
  */
 package beans;
 
+import javax.ejb.EJB;
 import javax.ejb.Remote;
 
-/**
- *
- * @author Amitash
- */
+
 @Remote
-public interface PublisherSessionBeanRemote {
+public interface PublisherStorageBeanRemote {
 
     long registerPublisher(String topic);
-
-    void publishContent(String publisherId, String title, String message);
     
 }

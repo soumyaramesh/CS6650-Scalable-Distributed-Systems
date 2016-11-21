@@ -24,6 +24,10 @@ public class MessageEntity implements Serializable {
     private Long id;
     private String message;
     
+    public MessageEntity() {
+        
+    }
+    
     public MessageEntity(String messString) {
         this.message = messString;
     }

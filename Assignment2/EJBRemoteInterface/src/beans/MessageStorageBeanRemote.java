@@ -8,12 +8,8 @@ package beans;
 import javax.ejb.EJB;
 import javax.ejb.Remote;
 
-/**
- *
- * @author Amitash
- */
+
 @Remote
-@EJB(mappedName = "ejb/MessageStorageBeanRemote")
 public interface MessageStorageBeanRemote {
 
     public void publishMessage(long pubId, String message);

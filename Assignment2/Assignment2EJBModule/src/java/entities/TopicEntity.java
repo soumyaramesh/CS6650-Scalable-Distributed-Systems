@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -25,11 +26,16 @@ public class TopicEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String topic;
+    @OneToMany
     private List<MessageEntity> messages;
+    
+    public TopicEntity() {
+        
+    }
     
     public TopicEntity(String topic) {
         this.topic = topic;
-        this.messages = new ArrayList<MessageEntity>();
+        this.messages = new ArrayList<>();
     }
 
     public String getTopic() {

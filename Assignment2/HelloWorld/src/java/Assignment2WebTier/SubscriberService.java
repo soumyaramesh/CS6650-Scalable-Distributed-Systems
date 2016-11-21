@@ -5,24 +5,21 @@
  */
 package Assignment2WebTier;
 
-import beans.PublisherSessionBeanRemote;
-import beans.SubscriberBeanRemote;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import beans.PublisherStorageBeanRemote;
+import beans.SubscriberStorageBeanRemote;
 
-/**
- *
- * @author Amitash
- */
+
 @Stateless
 @Path("subscriber")
 public class SubscriberService {
-    @EJB
-    private SubscriberBeanRemote subscriberBean;
+    @EJB(beanName = "SubscriberStorageBean" ,mappedName = "ejb/SubscriberStorageBeanRemote", beanInterface = SubscriberStorageBeanRemote.class)
+    private SubscriberStorageBeanRemote subscriberBean;
     
     @Path("registerSubscriber")
     @POST

@@ -5,14 +5,12 @@
  */
 package beans;
 
+import javax.ejb.EJB;
 import javax.ejb.Remote;
 
-/**
- *
- * @author Amitash
- */
+
 @Remote
-public interface SubscriberBeanRemote {
+public interface SubscriberStorageBeanRemote {
     public long registerSubscriber(String topic);
     
 }
