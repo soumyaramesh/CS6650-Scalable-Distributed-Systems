@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 
 /**
  *
@@ -20,7 +21,8 @@ public class PublisherEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name="pub_entity_seq_gen", sequenceName="PUB_ENTITY_SEQ")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pub_entity_seq_gen")
     private Long id;
     private String topic;
 

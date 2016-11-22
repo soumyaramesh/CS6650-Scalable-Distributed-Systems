@@ -10,18 +10,17 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-/**
- *
- * @author Amitash
- */
+
 @Stateless
 public class SubscriberStorageBean implements SubscriberStorageBeanRemote {
+
+    @PersistenceContext(unitName = "Assignment2EJBModulePU")
+    private EntityManager entityManager;
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
     
-    @PersistenceContext(unitName = "Assignment2EJBModulePU")
-    private EntityManager entityManager;
+    
 
     @Override
     public long registerSubscriber(String topic) {
@@ -30,5 +29,9 @@ public class SubscriberStorageBean implements SubscriberStorageBeanRemote {
         subscriberEntity.setLastSeenMessageId(Long.MIN_VALUE);
         entityManager.persist(subscriberEntity);
         return subscriberEntity.getId();
+    }
+
+    public void persist(Object object) {
+        entityManager.persist(object);
     }
 }

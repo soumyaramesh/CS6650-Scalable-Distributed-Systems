@@ -10,15 +10,13 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-/**
- *
- * @author Amitash
- */
 @Stateless
 public class PublisherStorageBean implements PublisherStorageBeanRemote {
-    
+
     @PersistenceContext(unitName = "Assignment2EJBModulePU")
     private EntityManager entityManager;
+    
+    
 
     @Override
     public long registerPublisher(String topic) {
@@ -33,6 +31,10 @@ public class PublisherStorageBean implements PublisherStorageBeanRemote {
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
+
+    public void persist(Object object) {
+        entityManager.persist(object);
+    }
 
     
 }

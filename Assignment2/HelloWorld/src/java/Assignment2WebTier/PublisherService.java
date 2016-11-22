@@ -6,28 +6,22 @@
 package Assignment2WebTier;
 
 import javax.ejb.EJB;
-import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import beans.PublisherStorageBeanRemote;
+import javax.ejb.Stateless;
 
-/**
- *
- * @author Amitash
- */
 @Stateless
-@Path("publisher")
+@Path("/publisher")
 public class PublisherService {
 
-    @EJB(beanName = "PublisherStorageBeanRemote",mappedName="ejb/PublisherStorageBeanRemote", beanInterface = PublisherStorageBeanRemote.class)
+    @EJB
     private PublisherStorageBeanRemote publisherSessionBean;
     
-    @Path("registerPublisher")
     @POST
     @Consumes("text/plain")
-    public long registerPublisher(@QueryParam("topic") String topic) {
+    public long registerPublisher(String topic) {
         return publisherSessionBean.registerPublisher(topic);
     }
 }

@@ -6,10 +6,14 @@
 package entities;
 
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 /**
  *
@@ -20,9 +24,21 @@ public class MessageEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name="message_entity_seq_gen", sequenceName="MESSAGE_ENTITY_SEQ")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "message_entity_seq_gen")
     private Long id;
     private String message;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "topicEntity", referencedColumnName = "topic")
+    private TopicEntity topicEntity;
+
+//    public TopicEntity getTopicEntity() {
+//        return topicEntity;
+//    }
+//
+//    public void setTopicEntity(TopicEntity topicEntity) {
+//        this.topicEntity = topicEntity;
+//    }
     
     public MessageEntity() {
         

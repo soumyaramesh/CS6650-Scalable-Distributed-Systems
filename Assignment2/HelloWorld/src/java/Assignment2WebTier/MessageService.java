@@ -10,33 +10,33 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.Path;;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-/**
- *
- * @author Amitash
- */
 @Stateless
-@Path("message")
+@Path("/message")
 public class MessageService {
 
-    @EJB(beanName="MessageStorageBean", mappedName = "ejb/MessageStorageBeanRemote", beanInterface = MessageStorageBeanRemote.class)
+    @EJB
     private MessageStorageBeanRemote messageStorageBean;
     
-    @Path("publishContent")
+    
     @POST
     @Consumes("text/plain")
-    public void publishContent(@QueryParam("publisherId") long publisherId,
-            @QueryParam("message") String message) {
+    @Produces("text/plain")
+    public void publishContent(@DefaultValue("1") @QueryParam("publisherId") long publisherId, String message) {
         messageStorageBean.publishMessage(publisherId, message);
     }
     
-    @Path("getLatestContent")
+    
     @GET
     @Consumes("text/plain")
-    public String getLatestContent(@QueryParam("subscriberId") long subscriberId) {
+    @Produces("text/plain")
+    public String getLatestContent(@DefaultValue("1") @QueryParam("subscriberId") long subscriberId) {
         return messageStorageBean.getLatestContent(subscriberId);
     }
     
