@@ -8,11 +8,14 @@ package beans;
 import entities.MessageEntity;
 import entities.PublisherEntity;
 import entities.SubscriberEntity;
-import entities.TopicEntity;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.jms.ConnectionFactory;
+import javax.jms.JMSConnectionFactory;
+import javax.jms.JMSContext;
 import javax.jms.Queue;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -21,6 +24,13 @@ import javax.persistence.Query;
 
 @Stateless
 public class MessageStorageBean implements MessageStorageBeanRemote {
+
+    @Resource(mappedName = "java:app/MessageQueue")
+    private Queue java_appMessageQueue;
+
+    @Inject
+    @JMSConnectionFactory("java:comp/DefaultJMSConnectionFactory")
+    private JMSContext context;
 
     @PersistenceContext(unitName = "Assignment2EJBModulePU")
     private EntityManager entityManager;
@@ -42,22 +52,9 @@ public class MessageStorageBean implements MessageStorageBeanRemote {
             System.out.println("Publisher's topic is " + topic);
             MessageEntity messageEntity = new MessageEntity();
             messageEntity.setMessage(message);
+            messageEntity.setTopic(topic);
             entityManager.persist(messageEntity);
-            TopicEntity topicEntity = (TopicEntity) entityManager.find(TopicEntity.class, topic);
-            if(topicEntity == null) {
-                System.out.println("Creating new queue for topic " + topic);
-                TopicEntity newTopicEntity = new TopicEntity(topic);
-                //messageEntity.setTopicEntity(newTopicEntity);
-                newTopicEntity.addMessage(messageEntity);
-                entityManager.persist(newTopicEntity);
-            }
-            else {
-                System.out.println("Found existing topic queue for topic " + topic);
-                System.out.println(topicEntity);
-                //messageEntity.setTopicEntity(topicEntity);
-                topicEntity.addMessage(messageEntity);
-                entityManager.persist(topicEntity);
-            }
+            sendJMSMessageToMessageQueue(message);
         }
     }
     
@@ -72,60 +69,64 @@ public class MessageStorageBean implements MessageStorageBeanRemote {
         String topic = subscriberEntity.getTopic();
         System.out.println("Subscriber's topic is " + topic);
         long lastSeenSeq = subscriberEntity.getLastSeenMessageId();
-        TopicEntity topicEntity = (TopicEntity) entityManager.find(TopicEntity.class, topic);
-        if(topicEntity == null) {
-            System.out.println("No queue for this topic yet " + topic);
+        System.out.println("Subscriber's last seen msg id = "  + lastSeenSeq);
+       
+        String queryString = "SELECT me "
+                + "FROM MessageEntity me "
+                + "WHERE me.topic = ?1 "
+                + "AND me.id > ?2 "
+                + "ORDER BY me.id";
+        Query query = entityManager.createQuery(queryString);
+        query.setParameter(1,topic);
+        query.setParameter(2, lastSeenSeq);
+        
+        List response = null;
+        try {
+         response = query.getResultList();
+        }
+        catch(Exception e) {
+            System.out.println("Query failed or There's no messages at all for this topic");
             return null;
         }
-        
-//        String queryString = "SELECT message from "
-//                + "(SELECT messages from TopicEntity te WHERE te.topic = ?1) "
-//                + "WHERE message.Id = ?2";
-        System.out.println("Found topic queue for this topic " + topic);
-        String queryString1 = "SELECT te.messages FROM TopicEntity te WHERE te.topic = ?1";
-        Query query1 = entityManager.createQuery(queryString1,TopicEntity.class);
-        //Query query = entityManager.createQuery(queryString);
-        query1.setParameter(1,topic);
-        
-        
-        //query.setParameter(2, lastSeenSeq+1);
-        List response = query1.getResultList();
         
         if(response == null || response.isEmpty()) {
-            System.out.println("Here comes trouble. Queue empty for this topic");
+            System.out.println("There's no messages at all for this topic");
             return null;
         }
-        System.out.println(response);
-        System.out.println(response.size());
-        MessageEntity resultMessageEntity = null;
-//        for((MessageEntity) me:response) {
-//            if(me.getId().equals(lastSeenSeq+1))
-//                resultMessageEntity = me;
-//        }
         
+        System.out.println("size of topic queue for topic " + topic + "is "+ response.size());
+        MessageEntity result = (MessageEntity) response.get(0);
         
-        
-        if(resultMessageEntity == null) {
-            System.out.println("No new messages in the queue");
+        if(result == null) {
+            System.out.println("Couldn't find a new message");
             return null;
         }
-       
-        else {
-            System.out.println("Returning message from queue " + resultMessageEntity.getMessage());
-            return resultMessageEntity.getMessage();
-        }
         
+        long latestMsgId = result.getId();
+        System.out.println("Delivered message from queue " + result.getMessage());
+        System.out.println(latestMsgId);
+        
+        subscriberEntity.setLastSeenMessageId(latestMsgId);
+        entityManager.persist(subscriberEntity);
+        return result.getMessage();
         
     }
     
     
     
-
+   
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
 
     public void persist(Object object) {
         entityManager.persist(object);
     }
+
+
+
+    private void sendJMSMessageToMessageQueue(String messageData) {
+        context.createProducer().send(java_appMessageQueue, messageData);
+    }
+
     
 }

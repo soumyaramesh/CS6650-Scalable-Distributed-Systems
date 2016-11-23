@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 
 /**
  *
@@ -20,10 +21,17 @@ public class WordCountEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
     private String word;
     private int count;
+    
+    public WordCountEntity() {
+        
+    }
+    
+    public WordCountEntity(String word) {
+        this.word = word;
+        this.count = 1;
+    }
 
     public String getWord() {
         return word;
@@ -40,19 +48,17 @@ public class WordCountEntity implements Serializable {
     public void setCount(int count) {
         this.count = count;
     }
-
-    public String getId() {
-        return id;
+    
+    public void incrementCount() {
+        this.count ++;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (word != null ? word.hashCode() : 0);
         return hash;
     }
 
@@ -63,7 +69,7 @@ public class WordCountEntity implements Serializable {
             return false;
         }
         WordCountEntity other = (WordCountEntity) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.word == null && other.word != null) || (this.word != null && !this.word.equals(other.word))) {
             return false;
         }
         return true;
@@ -71,7 +77,7 @@ public class WordCountEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.WordCountEntity[ id=" + id + " ]";
+        return "entities.WordCountEntity[ id=" + word + " ]";
     }
     
 }
