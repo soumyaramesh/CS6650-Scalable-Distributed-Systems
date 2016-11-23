@@ -42,10 +42,7 @@
  Version 2 license, then the option applies only if the new code is
  made subject to such option by the copyright holder.
 -->
-<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="3.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
-
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
     <session-config>
         <session-timeout>
             30
@@ -53,5 +50,10 @@
     </session-config>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
-        </welcome-file-list>
-    </web-app>
+    </welcome-file-list>
+    <ejb-ref>
+        <ejb-ref-name>WordCountStorageBean</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <remote>beans.WordCountStorageBeanRemote</remote>
+    </ejb-ref>
+</web-app>

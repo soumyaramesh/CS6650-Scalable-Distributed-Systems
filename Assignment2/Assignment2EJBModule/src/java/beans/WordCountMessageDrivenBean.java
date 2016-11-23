@@ -52,7 +52,7 @@ public class WordCountMessageDrivenBean implements MessageListener {
                     em.persist(newWordCountEntity);
                 }
                 else {
-                    System.out.println("Incrementing word count from " + we.getCount());
+                    System.out.println(word + " :Incrementing word count from " + we.getCount());
                     we.incrementCount();
                     System.out.println("To " + we.getCount());
                     em.persist(we);
