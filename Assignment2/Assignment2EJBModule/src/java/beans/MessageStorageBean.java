@@ -10,19 +10,29 @@ import entities.PublisherEntity;
 import entities.SubscriberEntity;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Resource;
+import javax.ejb.Singleton;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSConnectionFactory;
 import javax.jms.JMSContext;
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
 import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
-
 @Stateless
+@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 public class MessageStorageBean implements MessageStorageBeanRemote {
 
     @Resource(mappedName = "java:app/MessageQueue")
@@ -31,11 +41,14 @@ public class MessageStorageBean implements MessageStorageBeanRemote {
     @Inject
     @JMSConnectionFactory("java:comp/DefaultJMSConnectionFactory")
     private JMSContext context;
-
+    
     @PersistenceContext(unitName = "Assignment2EJBModulePU")
     private EntityManager entityManager;
-//    @Resource(mappedName = "jms/ConnectionFactory")
-//    private static ConnectionFactory cf;
+    
+    
+ 
+//    @JMSConnectionFactory("java:comp/DefaultJMSConnectionFactory")
+//    private ConnectionFactory cf;
 //    @Resource(mappedName = "jms/Queue")
 //    private static Queue queue;
     
@@ -54,6 +67,7 @@ public class MessageStorageBean implements MessageStorageBeanRemote {
             messageEntity.setMessage(message);
             messageEntity.setTopic(topic);
             entityManager.persist(messageEntity);
+            System.out.println("Succesfully published msg " + message);
             sendJMSMessageToMessageQueue(message);
         }
     }
@@ -125,8 +139,11 @@ public class MessageStorageBean implements MessageStorageBeanRemote {
 
 
     private void sendJMSMessageToMessageQueue(String messageData) {
+        
         context.createProducer().send(java_appMessageQueue, messageData);
+        
     }
+
 
     
 }

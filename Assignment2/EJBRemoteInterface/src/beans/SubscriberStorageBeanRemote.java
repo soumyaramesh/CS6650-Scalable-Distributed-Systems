@@ -10,6 +10,6 @@ import javax.ejb.Remote;
 
 @Remote
 public interface SubscriberStorageBeanRemote {
-    long registerSubscriber(String topic);
+    public long registerSubscriber(String topic);
     
 }

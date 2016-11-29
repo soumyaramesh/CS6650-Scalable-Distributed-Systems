@@ -19,8 +19,12 @@ import javax.persistence.SequenceGenerator;
 @Entity
 public class WordCountEntity implements Serializable {
 
+  
     private static final long serialVersionUID = 1L;
     @Id
+    @SequenceGenerator(name="wc_entity_seq_gen", sequenceName="WC_ENTITY_SEQ")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "wc_entity_seq_gen")
+    private Long id;
     private String word;
     private int count;
     
@@ -55,10 +59,19 @@ public class WordCountEntity implements Serializable {
 
     
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+   
+
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (word != null ? word.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -69,7 +82,7 @@ public class WordCountEntity implements Serializable {
             return false;
         }
         WordCountEntity other = (WordCountEntity) object;
-        if ((this.word == null && other.word != null) || (this.word != null && !this.word.equals(other.word))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -77,7 +90,7 @@ public class WordCountEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.WordCountEntity[ id=" + word + " ]";
+        return "entities.WordCountEntity[ id=" + id + " ]";
     }
     
 }

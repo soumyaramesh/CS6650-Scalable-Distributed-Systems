@@ -14,6 +14,6 @@ import javax.ejb.Remote;
 @Remote
 public interface WordCountStorageBeanRemote {
 
-    String getTopNWords(int n);
+    public String getTopNWords(int n);
     
 }

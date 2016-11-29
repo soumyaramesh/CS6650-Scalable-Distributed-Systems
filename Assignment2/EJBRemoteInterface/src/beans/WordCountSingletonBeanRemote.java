@@ -5,13 +5,15 @@
  */
 package beans;
 
-import javax.ejb.EJB;
 import javax.ejb.Remote;
 
-
+/**
+ *
+ * @author Amitash
+ */
 @Remote
-public interface PublisherStorageBeanRemote {
+public interface WordCountSingletonBeanRemote {
 
-    public long registerPublisher(String topic);
+    public void updateWordCount(String message);
     
 }
