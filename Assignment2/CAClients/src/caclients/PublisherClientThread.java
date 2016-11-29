@@ -42,7 +42,7 @@ public class PublisherClientThread implements Runnable{
         Client client = ClientBuilder.newClient();
         
         try {
-            for(int i=1;i<=maxMessages;i++) {
+            for(int i=0;i<=maxMessages;i++) {
                 WebTarget myResource = client.target(BASE_URL + resourceUrl).queryParam("publisherId", pubId);
                 Response response = myResource.request(MediaType.TEXT_PLAIN).post(Entity.text(message));
             }

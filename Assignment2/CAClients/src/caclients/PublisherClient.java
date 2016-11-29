@@ -23,7 +23,7 @@ public class PublisherClient {
         long start = 0;
 
 
-        int numberOfMessages = (args.length < 1) ? 20 : Integer.parseInt(args[0]);
+        int numberOfMessages = (args.length < 1) ? 100 : Integer.parseInt(args[0]);
         int publisherThreads = (args.length < 2) ? 3 : Integer.parseInt(args[1]);
         System.out.println("Number of messages  = " + numberOfMessages);
         System.out.println("number of pub threads = " + publisherThreads);

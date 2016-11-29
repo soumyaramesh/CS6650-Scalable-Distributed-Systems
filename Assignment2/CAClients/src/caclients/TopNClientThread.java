@@ -30,6 +30,8 @@ public class TopNClientThread implements Runnable {
          //To change body of generated methods, choose Tools | Templates.
             Random random = new Random();
             int n = random.nextInt(100);
+            //int n = 10;
+            System.out.println(n);
             Client client = ClientBuilder.newClient();
             WebTarget myResource2 = client.target(BASE_URL + topnUrl).queryParam("n", n);
             Response topN = myResource2.request(MediaType.TEXT_PLAIN).get();
